@@ -1,0 +1,21 @@
+{
+  "name": "this-weekend-frontend",
+  "version": "0.0.0",
+  "homepage": "https://github.com/ryb73/this-weekend-frontend",
+  "authors": [
+    "ryb73 <rpbiwer@gmail.com>"
+  ],
+  "license": "GPLv2",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "1.2.28",
+    "jquery": "~2.1.3"
+  }
+}
