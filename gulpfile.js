@@ -16,23 +16,35 @@ var BOWER_DIR     = "bower_components/",
     BUILD_DIR     = "build/",
     BUILD_DEV_DIR = "build-dev/";
 
-gulp.task("default", ["clean"], function() {
+gulp.task("prod", ["clean"], function() {
   build(BUILD_DIR);
 });
 
-gulp.task("d", ["clean"], function() {
+gulp.task("default", ["clean"], function() {
   return build(BUILD_DEV_DIR)
     .then(function() {
-      return q.fcall(del, [TEMP_DIR]);
+      var deferred = q.defer();
+      del([TEMP_DIR], deferred.resolve());
+      return deferred.promise
     });
+});
+
+gulp.task("build styles", buildStyles.bind(null, SRC_DIR, BUILD_DEV_DIR, false));
+gulp.task("build scripts", buildScripts.bind(null, SRC_DIR, BUILD_DEV_DIR, false));
+gulp.task("build html", buildHtml.bind(null, SRC_DIR, BUILD_DEV_DIR, false));
+
+gulp.task("watch", ["default"], function() {
+  gulp.watch(SRC_DIR + "styles/**/*.less", ["build styles"]);
+  gulp.watch(SRC_DIR + "scripts/**/*.js", ["build scripts"]);
+  gulp.watch(SRC_DIR + "**/*.html", ["build html"]);
 });
 
 function build(buildDir) {
   return createTemp()
     .then(copyVendor.bind(null, buildDir))
-    .then(buildStyles.bind(null, buildDir))
-    .then(buildScripts.bind(null, buildDir))
-    .then(buildHtml.bind(null, buildDir))
+    .then(buildStyles.bind(null, TEMP_DIR, buildDir, true))
+    .then(buildScripts.bind(null, TEMP_DIR, buildDir, true))
+    .then(buildHtml.bind(null, TEMP_DIR, buildDir, true))
     .then(copyTempToBuild.bind(null, buildDir));
 }
 
@@ -57,42 +69,42 @@ function copyVendor(buildDir) {
   return deferred.promise;
 }
 
-function buildStyles(buildDir) {
+function buildStyles(fromDir, toDir, deleteOriginal) {
   var deferred = q.defer(),
-      path = TEMP_DIR + "styles/**/*.less";
+      path = fromDir + "styles/**/*.less";
 
   gulp.src(path)
     .pipe(less())
     .pipe(minifyCss())
-    .pipe(gulp.dest(buildDir + "styles"))
-    .on("end", delAndResolve.bind(null, path, deferred));
+    .pipe(gulp.dest(toDir + "styles"))
+    .on("end", (deleteOriginal) ? delAndResolve.bind(null, path, deferred) : deferred.resolve);
 
   return deferred.promise;
 }
 
-function buildScripts(buildDir) {
+function buildScripts(fromDir, toDir, deleteOriginal) {
   var deferred = q.defer(),
-      path = TEMP_DIR + "scripts/**/*.js";
+      path = fromDir + "scripts/**/*.js";
 
   gulp.src(path)
     .pipe(uglify())
-    .pipe(gulp.dest(buildDir + "scripts"))
-    .on("end", delAndResolve.bind(null, path, deferred));
+    .pipe(gulp.dest(toDir + "scripts"))
+    .on("end", (deleteOriginal) ? delAndResolve.bind(null, path, deferred) : deferred.resolve);
 
   return deferred.promise;
 }
 
-function buildHtml(buildDir) {
+function buildHtml(fromDir, toDir, deleteOriginal) {
   var deferred = q.defer(),
-      path = TEMP_DIR + "**/*.html";
+      path = fromDir + "**/*.html";
 
   gulp.src(path)
     .pipe(minifyHtml({
       conditionals: true,
       empty: true
     }))
-    .pipe(gulp.dest(buildDir))
-    .on("end", delAndResolve.bind(null, path, deferred));
+    .pipe(gulp.dest(toDir))
+    .on("end", (deleteOriginal) ? delAndResolve.bind(null, path, deferred) : deferred.resolve);
 
   return deferred.promise;
 }
