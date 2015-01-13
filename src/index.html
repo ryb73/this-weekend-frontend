@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html data-ng-app="thisWeekend" data-ng-strict-di>
 <head>
   <link rel="stylesheet" href="styles/main.css">
   <title>This Weekend | What's happening this weekend?</title>
@@ -7,7 +7,11 @@
 <body>
   <h1>This Weekend</h1>
 
-  <script src="scripts/main.js"></script>
+  <div data-ng-view>
+    Loading...
+  </div>
+
   <script src="scripts/vendor.js"></script>
+  <script src="scripts/main.js"></script>
 </body>
 </html>

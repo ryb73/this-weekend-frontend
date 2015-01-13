@@ -25,7 +25,7 @@ gulp.task("default", ["clean"], function() {
     .then(function() {
       var deferred = q.defer();
       del([TEMP_DIR], deferred.resolve());
-      return deferred.promise
+      return deferred.promise;
     });
 });
 
@@ -61,7 +61,12 @@ function createTemp() {
 function copyVendor(buildDir) {
   var deferred = q.defer();
 
-  gulp.src([ BOWER_DIR + "angular/angular.js", BOWER_DIR + "jquery/dist/jquery.js" ])
+  gulp.src([
+      BOWER_DIR + "angular/angular.js",
+      BOWER_DIR + "jquery/dist/jquery.js",
+      BOWER_DIR + "angular-route/angular-route.js",
+      BOWER_DIR + "angular-resource/angular-resource.js"
+    ])
     .pipe(concat("vendor.js"))
     .pipe(gulp.dest(TEMP_DIR + "scripts"))
     .on("end", deferred.resolve);

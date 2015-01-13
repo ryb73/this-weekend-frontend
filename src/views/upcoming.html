@@ -1,0 +1,28 @@
+<div data-ng-show="loading">
+  Requesting upcoming shows...
+</div>
+
+<div data-ng-show="error">
+  Error: {{ error.status }} - {{ error.statusText }}
+</div>
+
+<div data-ng-repeat="happening in happenings">
+  <div>
+    <span data-ng-repeat="headliner in happening.headliners">
+      {{ !$first ? "," : "" }}{{ headliner.name }}
+    </span>
+
+    at {{ happening.venue.name }}
+  </div>
+
+  <div data-ng-if="happening.openers.length > 0">
+    with
+    <span data-ng-repeat="opener in happening.openers">
+      {{ !$first ? ", " : "" }}{{ opener.name }}
+    </span>
+  </div>
+
+  <div>
+    {{ happening.showtime.toLocaleString() }}
+  </div>
+</div>
